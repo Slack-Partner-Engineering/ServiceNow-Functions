@@ -10,6 +10,8 @@ your SERVICENOW_INSTANCE is `Instance name`
 your SERVICENOW_USERNAME should just be `admin` unless you or ServiceNow changed something as of March 31, 2022.
 your SERVICENOW_PW should be there in your login credentials.
 
+> If you want to run this is local mode, you will need to copy the `sample.env` file, rename it to `.env`, add your env variables, and then run `source .env` to set your variables. 
+
 Save all those to a clipboard, since you will need to set them as env variables.
 
 ```bash
