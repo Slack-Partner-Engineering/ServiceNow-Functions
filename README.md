@@ -1,33 +1,33 @@
-# Next-gen Slack platform project template - Reverse String
-This repo contains a sample project and embedded lightweight SDK of a Typescript based project for the new Deno runtime. 
+Step 0: Clone this repo!
 
-The main file that brings it all together is the `project.ts` file.  So far `functions`, `workflows`, `triggers` and `tables` are supported and those should each be created in a file per, under each corresponding directory. `functions/reverse.ts` has a simple sample. After you create a new function or workflow make sure you add it to the `Project` object in `project.ts`. 
+Step 1: Gather details from your ServiceNow developer account. First you must get a developer account here: https://developer.servicenow.com/dev.do
 
-## Setup
+Step 2: Click on your Profile picture (top right), and select "Manage insance password."
 
-Create a new project using this as repo as a template.
+![now_credentials](https://media.slack-github.com/user/2212/files/899f8480-b0d8-11ec-8434-13044b9d4ae8)
 
-```bash
-slack create -t slackapi/deno-reverse-string
-```
+your SERVICENOW_INSTANCE is `Instance name`
+your SERVICENOW_USERNAME should just be `admin` unless you or ServiceNow changed something as of March 31, 2022.
+your SERVICENOW_PW should be there in your login credentials.
 
-## Running it locally
-
-```bash
-slack run
-```
-
-## Deploying to Slack's Hosting
+Save all those to a clipboard, since you will need to set them as env variables.
 
 ```bash
-slack deploy
+$ hermes-dev var add SERVICENOW_USERNAME [Ctrl+V] [Enter]
+$ hermes-dev var add SERVICENOW_PW [Ctrl+V] [Enter]
+$ hermes-dev var add SERVICENOW_INSTANCE [Ctrl+V] [Enter]
 ```
 
-## Testing
+change this line in manifest to use your `SERVICENOW_INSTANCE`.
 
-You can write tests for your function, see `functions/reverse_test.ts` for a sample. Test base filenames should be suffixed with `_test`. To run tests just run:
+```
+"outgoing_domains": ["dev99588.service-now.com"]
+```
+
+That's it, you're ready to deploy.
 
 ```bash
-slack deno test
+$ hermes-dev deploy
 ```
 
+and then try it out!
