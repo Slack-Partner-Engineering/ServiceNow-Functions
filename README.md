@@ -1,6 +1,6 @@
 # 🤖 ServiceNew Functions 🤖
 
-This project aims to speed up the time to understand & implement functions with the [beta Slack platform](https://api.slack.com/future/quickstart). 
+This project aims to speed up the time to understand & implement functions with the [beta Slack platform](https://api.slack.com/future/quickstart). It uses the beta platform to perform CRUD operations (Create, Read, Update, Delete) within Slack. 
 
 # Steps 
 1. [Clone the repo](#step-1-clone-the-repo)
@@ -55,6 +55,11 @@ That's it, you're ready to deploy.
 ```bash
 $ hermes-dev deploy
 ```
+
+## Step 5. Run the Delete an Incident Function
+
+[![DeleteInc](https://media.slack-github.com/user/2212/files/9eacf4d7-770c-422e-afbe-6976b51ba233)](https://media.slack-github.com/user/2212/files/d30f24ed-5aac-484d-b8fd-b47ef4764eec)
+
 
 Great job! Now you should be able to find your shortcut in the shortcuts menu! Go ahead and try it out by clicking on the shortcut and filling in the form.
 
