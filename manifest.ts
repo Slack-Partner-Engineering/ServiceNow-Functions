@@ -80,6 +80,54 @@ export default {
         }
       }
     },
+    "Get-Incidents": {
+      "title": "Get all incidents",
+      "description": "Get all incdients in an ServiceNow instance.",
+      "source_file": "functions/get_incidents.ts",
+      "input_parameters": {
+        "required": [],
+        "properties": {
+        }
+      },
+      "output_parameters": {
+        "required": [],
+        "properties": {
+          "ServiceNowResponse": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Update-An-Incident": {
+      "title": "Update an incident",
+      "description": "Update a ServiceNow incident.",
+      "source_file": "functions/update_incident.ts",
+      "input_parameters": {
+        "required": [],
+        "properties": {
+          "incident_number": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string"
+          },
+          "urgency": {
+            "type": "string"
+          },
+          "impact": {
+            "type": "string"
+          },
+        }
+      },
+      "output_parameters": {
+        "required": [],
+        "properties": {
+          "ServiceNowResponse": {
+            "type": "string"
+          }
+        }
+      }
+    },
   },
   "outgoing_domains": ["dev88853.service-now.com"]
 }

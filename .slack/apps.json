@@ -6,5 +6,13 @@
       "team_id": "T038J6TH5PF"
     }
   },
-  "default": "devrelsandbox"
+  "default": "devrelsandbox",
+  "dev": {
+    "U039XGZL5DW": {
+      "name": "dev",
+      "app_id": "A03J461VDHQ",
+      "team_id": "T038J6TH5PF",
+      "user_id": "U039XGZL5DW"
+    }
+  }
 }

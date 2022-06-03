@@ -5,7 +5,7 @@ export default async ({ ctx, inputs, env }: any) => {
   const instance = env["SERVICENOW_INSTANCE"]
 
   const response = await fetch(
-    "https://" + env["SERVICENOW_INSTANCE"] + ".service-now.com/api/now/table/incident",
+    "https://" + instance + ".service-now.com/api/now/table/incident",
     {
       method: "POST",
       headers: {
