@@ -1,133 +1,148 @@
-export default {
-  "_metadata": {
-    "major_version": 2
-  },
-  "display_information": {
-    "name": "Built By Horea Porutiu"
-  },
-  // Once Manifest APIs support this, we'll add it
-  // "runtime_environment": "slack",
-  "runtime": "deno1.19",
-  "type":"hosted",
-  // The CLI should still read this and update the icon, then remove if from what's sent to manifest APIs
-  // We could have the deno-slack-builder make sure this file is included in the `output` path if helpful
-  "icon": "assets/icon.png",
-  "features": {
-    "app_home": {
-      "home_tab_enabled": false,
-      "messages_tab_enabled": false,
-      "messages_tab_read_only_enabled": false
-    },
-    "bot_user": {
-      "display_name": "Create ServiceNow Incidentmay9"
-    } 
-  },
-  "oauth_config": {
-    "scopes": {
-      "bot": [
-        "commands",
-        "chat:write",
-        "chat:write.public"
-      ]
-    }
-  },
-  "functions": {
-    "Create-An-Incident": {
-      "title": "Create an incident",
-      "description": "Create an incident in ServiceNow",
-      "source_file": "functions/create_incident.ts",
-      "input_parameters": {
-        "required": [],
-        "properties": {
-          "short_description": {
-            "type": "string"
-          },
-          "urgency": {
-            "type": "string"
-          },
-          "impact": {
-            "type": "string"
-          },
-        }
+import { DefineFunction, Manifest, Schema } from "deno-slack-sdk/mod.ts";
+
+export const GetIncident = DefineFunction({
+  callback_id: "getIncident",
+  title: "Find an Incident",
+  description: "Get an Incident from your ServiceNow instance and post details to a channel.",
+  source_file: "functions/get_incident.ts",
+  input_parameters: {
+    properties: {
+      incident_number: {
+        type: Schema.types.string,
+        description: "The incident to find, for example: INC0000049",
       },
-      "output_parameters": {
-        "required": [],
-        "properties": {
-          "ServiceNowResponse": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "Delete-An-Incident": {
-      "title": "Delete an incident",
-      "description": "Delete an incident in ServiceNow",
-      "source_file": "functions/delete_incident.ts",
-      "input_parameters": {
-        "required": [],
-        "properties": {
-          "incident_number": {
-            "type": "string"
-          },
-        }
+      channel: {
+        type: Schema.slack.types.channel_id,
+        description: "Select channel to post results in",
       },
-      "output_parameters": {
-        "required": [],
-        "properties": {
-          "ServiceNowResponse": {
-            "type": "string"
-          }
-        }
-      }
     },
-    "Get-Incidents": {
-      "title": "Get all incidents",
-      "description": "Get all incdients in an ServiceNow instance.",
-      "source_file": "functions/get_incidents.ts",
-      "input_parameters": {
-        "required": [],
-        "properties": {
-        }
-      },
-      "output_parameters": {
-        "required": [],
-        "properties": {
-          "ServiceNowResponse": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "Update-An-Incident": {
-      "title": "Update an incident",
-      "description": "Update a ServiceNow incident.",
-      "source_file": "functions/update_incident.ts",
-      "input_parameters": {
-        "required": [],
-        "properties": {
-          "incident_number": {
-            "type": "string"
-          },
-          "short_description": {
-            "type": "string"
-          },
-          "urgency": {
-            "type": "string"
-          },
-          "impact": {
-            "type": "string"
-          },
-        }
-      },
-      "output_parameters": {
-        "required": [],
-        "properties": {
-          "ServiceNowResponse": {
-            "type": "string"
-          }
-        }
-      }
-    },
+    required: ["incident_number", "channel"],
   },
-  "outgoing_domains": ["dev88853.service-now.com"]
-}
+  output_parameters: {
+    properties: {
+      ServiceNowResponse: {
+        type: Schema.types.string,
+        description: "",
+      },
+    },
+    required: ["ServiceNowResponse"],
+  },
+});
+
+export const UpdateIncident = DefineFunction({
+  callback_id: "updateIncident",
+  title: "Update an Incident",
+  description: "Update an Incident from your ServiceNow instance and post details to a channel.",
+  source_file: "functions/update_incident.ts",
+  input_parameters: {
+    properties: {
+      incident_number: {
+        type: Schema.types.string,
+        description: "The incident to find, for example: INC0000049",
+      },
+      channel: {
+        type: Schema.slack.types.channel_id,
+        description: "Select channel to post results in",
+      },
+      short_description: {
+        type: Schema.types.string,
+        description: "the short description of the incident",
+      },
+      priority: {
+        type: Schema.types.string,
+        description: "What is the priority of the incident?",
+      },
+      state: {
+        type: Schema.types.string,
+        description: "State of incident. Closed, resolved, in progress, etc.",
+      },
+      comments: {
+        type: Schema.types.string,
+        description: "Comments for the incident",
+      },
+    },
+    required: ["incident_number", "channel"],
+  },
+  output_parameters: {
+    properties: {
+      ServiceNowResponse: {
+        type: Schema.types.string,
+        description: "The API response from ServiceNow",
+      },
+    },
+    required: ["ServiceNowResponse"],
+  },
+});
+
+export const CreateIncident = DefineFunction({
+  callback_id: "createIncident",
+  title: "Create an Incident",
+  description: "Create an Incident from your ServiceNow instance and post details to a channel.",
+  source_file: "functions/create_incident.ts",
+  input_parameters: {
+    properties: {
+      short_description: {
+        type: Schema.types.string,
+        description: "Short description of the incident",
+      },
+      state: {
+        type: Schema.types.string,
+        description:
+          "State of the Incident. Possible values are: New, In Progress, On Hold, Resolved, Closed, Cancelled",
+        default: "1",
+        enum: ["1", "2", "3", "6", "7", "8"],
+        choices: [{
+          title: "New",
+          value: "1",
+        }, {
+          title: "In Progress",
+          value: "2",
+        }, {
+          title: "On Hold",
+          value: "3",
+        }, {
+          title: "Resolved",
+          value: "6",
+        }, {
+          title: "Closed",
+          value: "7",
+        }, {
+          title: "Cancelled",
+          value: "8",
+        }],
+      },
+      comments: {
+        type: Schema.types.string,
+        description: "Comments for the incident",
+      },
+      assigned_to: {
+        type: Schema.slack.types.user_id,
+        description: "Select the user to assign this incident to. \n 🚨 If you assign someone, the state will be overwritten to In Progress 🚨",
+      },
+      channel: {
+        type: Schema.slack.types.channel_id,
+        description: "Select channel to post results in",
+      },
+    },
+    required: ["channel", "short_description"],
+  },
+  output_parameters: {
+    properties: {
+      ServiceNowResponse: {
+        type: Schema.types.string,
+        description: "The API response from ServiceNow",
+      },
+    },
+    required: ["ServiceNowResponse"],
+  },
+});
+
+export default Manifest({
+  name: "Horea Partner Eng",
+  description: "Reverse a string",
+  icon: "assets/icon.png",
+  functions: [UpdateIncident, GetIncident, CreateIncident],
+  outgoingDomains: ["dev88853.service-now.com"],
+  botScopes: ["commands", "chat:write", "chat:write.public", "channels:read", "users:read"],
+});
+

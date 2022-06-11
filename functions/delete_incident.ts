@@ -1,14 +1,13 @@
 export default async ({ ctx, inputs, env }: any) => {
   const username = env["SERVICENOW_USERNAME"];
   const password = env["SERVICENOW_PW"];
-  const instance = env["SERVICENOW_INSTANCE"]
+  const instance = env["SERVICENOW_INSTANCE"];
 
   try {
-
     // this is needed as a query param to delete an incident
     const sysID = inputs.incident_number;
 
-    let response = await fetch(
+    let incidentResp = await fetch(
       "https://" + instance + ".service-now.com/api/now/table/incident/" +
         sysID,
       {
@@ -19,14 +18,18 @@ export default async ({ ctx, inputs, env }: any) => {
         },
       },
     );
-    console.log(response);
-    if (response.body == null && response.status === 204) {
+    console.log('incidentResp from deleteIncident: ');
+    console.log(incidentResp);
+    if (incidentResp.body == null && incidentResp.status === 204) {
       return await {
-        outputs: { ServiceNowResponse: 'Sucessfully deleted record with sys_id: ' + sysID },
+        outputs: {
+          ServiceNowResponse: "Sucessfully deleted record with sys_id: " +
+            sysID,
+        },
       };
     }
     return await {
-      outputs: { ServiceNowResponse: response },
+      outputs: { ServiceNowResponse: incidentResp },
     };
   } catch (err) {
     console.error(err);
