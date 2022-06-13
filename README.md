@@ -7,6 +7,7 @@ This project aims to speed up the time to understand & implement functions with 
 2. [ServiceNow Configuration](#step-2-ServiceNow-configuration-basic-auth)
 3. [Add Environmental Variables in Hermes](#step-3-add-environmental-variables-in-hermes)
 4. [Deploy the App](#step-4-deploy-the-app)
+4. [Run the Functions](#step-4-run-the-functions)
 
 ## Step 1. Clone the Repo
 
@@ -56,9 +57,9 @@ That's it, you're ready to deploy.
 $ hermes-dev deploy
 ```
 
-## Step 5. Run the Delete an Incident Function
+## Step 5. Run the Functions
 
-[![DeleteInc](https://media.slack-github.com/user/2212/files/9eacf4d7-770c-422e-afbe-6976b51ba233)](https://media.slack-github.com/user/2212/files/d30f24ed-5aac-484d-b8fd-b47ef4764eec)
+[![DeleteInc](https://media.slack-github.com/user/2212/files/9eacf4d7-770c-422e-afbe-6976b51ba233)](https://media.slack-github.com/user/2212/files/42c08e44-5f86-45ab-9483-ae4605b8f6c1)
 
 
 Great job! Now you should be able to find your shortcut in the shortcuts menu! Go ahead and try it out by clicking on the shortcut and filling in the form.

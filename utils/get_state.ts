@@ -59,7 +59,7 @@ export class State {
       case 'On Hold':
         curState = "On Hold ✋🏼";
         break;
-      case '8':
+      case 'Cancelled':
         curState = "Cancelled ❌";
         break;
       default:
