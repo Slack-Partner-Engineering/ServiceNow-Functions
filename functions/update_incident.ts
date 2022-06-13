@@ -63,10 +63,10 @@ export default async ({ token, inputs, env }: any) => {
   let body = await JSON.stringify(requestBody)
   console.log('body: ')
   console.log(body)
-  // const urlWithSysParm = "https://" + instance + ".service-now.com/api/now/table/incident/" + sys_id + '?sysparm_display_value=true'
-  const url = "https://" + instance + ".service-now.com/api/now/table/incident/" + sys_id
+  const urlWithSysParm = "https://" + instance + ".service-now.com/api/now/table/incident/" + sys_id + '?sysparm_display_value=true'
+  // const url = "https://" + instance + ".service-now.com/api/now/table/incident/" + sys_id
   const updateIncResp = await fetch(
-    url,
+    urlWithSysParm,
     {
       method: "PUT",
       headers: {
