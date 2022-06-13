@@ -1,27 +1,35 @@
-import { SlackAPI } from "deno-slack-api/mod.ts";
+import { SlackAPI } from 'deno-slack-api/mod.ts';
+import { Blocks } from "../utils/get_blocks.ts";
+import { State } from "../utils/get_state.ts";
+import { User } from "../utils/get_user_info.ts";
+import { Channel } from "../utils/channel_utils.ts";
 
 export default async ({ token, inputs, env }: any) => {
   try {
-
+    //needed for auth,
     const username = env["SERVICENOW_USERNAME"];
     const password = env["SERVICENOW_PW"];
     const instance = env["SERVICENOW_INSTANCE"];
+    // the channel to post incident info to
     const channel = inputs.channel
+    const header = "New Incident Created :memo:";
 
-    const client = SlackAPI(token, {});
-
-    console.log(inputs)
-    let requestBody = await JSON.stringify({
+    //build the requestBody with our inputs from the UI
+    let requestBody: any = {
       "short_description": inputs.short_description,
       "state": inputs.state,
-      "comments": inputs.comments,
-      "assigned_to": inputs.assigned_to,
-      "channel": inputs.channel,
-    })
+      "caller_id": inputs.caller,
+    }
+    //only add optional fields to request body if they were filled in in the UI
+    if (inputs.assigned_to) {
+      requestBody.assigned_to = inputs.assigned_to
+    }
+    if (inputs.comments) {
+      requestBody.comments = inputs.comments
+    }
 
-    console.log(requestBody)
-
-    const incidentResp = await fetch(
+    //API request to create a new incident in ServiceNow
+    const incidentResp: any = await fetch(
       "https://" + instance + ".service-now.com/api/now/table/incident",
       {
         method: "POST",
@@ -29,84 +37,51 @@ export default async ({ token, inputs, env }: any) => {
           "Authorization": "Basic " + btoa(username + ":" + password),
           "Content-Type": "application/json",
         },
-        body: requestBody
+        body: JSON.stringify(requestBody)
       },
     )
-      .then((incidentResp) => incidentResp.json())
-      .then((data) => {
-        return data;
-      });
+    .then((incidentResp) => incidentResp.json())
 
+    console.log('incidentResp:')
     console.log(incidentResp)
+
+    //get user info so we can mention Slack Users directly in UI
+    let assignedToUser;
+    let user = new User();
+    if (inputs.assigned_to){
+      assignedToUser = await user.getUserInfo(token, inputs.assigned_to)
+    } else {
+      assignedToUser = 'N/A'
+    }
+    let callerUser: any = await user.getUserInfo(token, inputs.caller)
+
+    //Get current state of the incident, make sure it looks nice in UI
+    let state = new State()
+    let curState = state.getStateFromNum(incidentResp.result.state)
+    let block = new Blocks();
     const incident_number = incidentResp.result.task_effective_number
-
-    const userInfo = await client.apiCall("users.info", {
-      user: inputs.assigned_to,
-    });
-    let user: any = await userInfo.user
-
-    const authTest = await client.apiCall("auth.test", {});
-    let curUser: any = await authTest.user
-
-
-    const channelInfoResp = await client.apiCall("conversations.info", {
-      channel: channel,
-    });
-    let channelInfo: any = await channelInfoResp.channel
-
     let incidentLink = "https://" + instance + ".service-now.com/nav_to.do?uri=task.do?sysparm_query=number=" + incident_number
-
-    // must map state number with the actual state, i.e 1 == new, 2 == in progress, etc
-    let curState;
-    switch (incidentResp.result.state) {
-      case 1:
-        curState = "New";
-        break;
-      case 2:
-        curState = "In Progress";
-        break;
-      case 3:
-        curState = "On Hold";
-        break;
-      case 6:
-        curState = "Resolved";
-        break;
-      case 7:
-        curState = "Closed";
-        break;
-      case 8:
-        curState = "Cancelled";
-        break;
-      default:
-        curState = "In Progress"
+    
+    let incidentBlock;
+    //assign Block Kit blocks for a better UI experience, check if someone was assigned    
+    if (!assignedToUser){
+      incidentBlock = block.getBlocks(header, incidentResp.result.number, incidentResp.result.short_description,
+        curState, inputs.comments, callerUser.name, assignedToUser, incidentLink)
+    }   
+    else {
+      incidentBlock = block.getBlocks(header, incidentResp.result.number, incidentResp.result.short_description,
+        curState, inputs.comments, callerUser.name, assignedToUser.name, incidentLink)
     }
 
-    //need to parse the assigned to, and 
+    //get channel name, and blocks to channel
+    let channelObj = new Channel()
+    let channelInfo: any = await channelObj.getChannelInfo(token, channel)
+    await channelObj.postToChannel(token, channel, incidentBlock);
 
-    let incidentBlock = [];
-    incidentBlock.push({
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text":
-          "*Incident Id:* " + "<" + `${incidentLink}` + "|" + `${incidentResp.result.task_effective_number}` + ">" + "\n" +
-          "*Incident Short Description:* " + `${incidentResp.result.short_description}` + "\n" +
-          "*Incident Priority:* " + `${incidentResp.result.priority}` + "\n" +
-          "*Incident State:* " + `${curState}` + "\n" +
-          "*Incident Comments:* " + `${incidentResp.result.comments}` +
-          "*Incident Caller:* " + `${curUser}` + "\n" +
-          "*Incident Assigned To:* " + `@${user.name}` + "\n"
-      },
-    });
-
-    const resp = await client.apiCall("chat.postMessage", {
-      text: ``,
-      channel: channel,
-      blocks: incidentBlock,
-    });
-
+    //output modal once the function finishes running
     return await {
-      outputs: { ServiceNowResponse: "Please go to channel " + `#${channelInfo.name}` + " to view all of your incidents." },
+      outputs: { ServiceNowResponse: "Please go to channel " + `#${channelInfo.name}` + " to view your newly created incident " +
+      `${incidentResp.result.number}` + "."},
     };
 
   } catch (err) {
@@ -116,5 +91,4 @@ export default async ({ token, inputs, env }: any) => {
       console.log('Unexpected error', err);
     }
   }
-
 };
