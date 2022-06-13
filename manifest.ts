@@ -47,7 +47,7 @@ export const UpdateIncident = DefineFunction({
       state: {
         type: Schema.types.string,
         description:
-          "State of the incident: New, In Progress, On Hold, Cancelled",
+          "State of the incident: New, In Progress, On Hold, Canceled",
         default: "1",
         enum: ["1", "2", "3", "8"],
         choices: [{
@@ -60,7 +60,7 @@ export const UpdateIncident = DefineFunction({
           title: "On Hold",
           value: "3",
         }, {
-          title: "Cancelled",
+          title: "Canceled",
           value: "8",
         }],
       },
@@ -73,8 +73,24 @@ export const UpdateIncident = DefineFunction({
         description: "User who is responisble for working on the incident",
       },
       caller: {
-        type: Schema.slack.types.user_id,
-        description: "User who is affected by the incident",
+        type: Schema.types.string,
+        description:
+          "User who is affected by the ticket",
+        default: "Abraham Lincoln",
+        enum: ["Abraham Lincoln", "Adela Cervantsz", "Aileen Mottern", "Alejandra Prenatt"],
+        choices: [{
+          title: "Abraham Lincoln",
+          value: "Abraham Lincoln",
+        }, {
+          title: "Adela Cervantsz",
+          value: "Adela Cervantsz",
+        }, {
+          title: "Aileen Mottern",
+          value: "Aileen Mottern",
+        }, {
+          title: "Alejandra Prenatt",
+          value: "Alejandra Prenatt",
+        }],
       },
       channel: {
         type: Schema.slack.types.channel_id,
@@ -108,7 +124,7 @@ export const CreateIncident = DefineFunction({
       state: {
         type: Schema.types.string,
         description:
-          "State of the incident: New, In Progress, On Hold, Cancelled",
+          "State of the incident: New, In Progress, On Hold, Canceled",
         default: "1",
         enum: ["1", "2", "3", "8"],
         choices: [{
@@ -121,7 +137,7 @@ export const CreateIncident = DefineFunction({
           title: "On Hold",
           value: "3",
         }, {
-          title: "Cancelled",
+          title: "Canceled",
           value: "8",
         }],
       },
@@ -134,8 +150,24 @@ export const CreateIncident = DefineFunction({
         description: "User who is responisble for working on the incident",
       },
       caller: {
-        type: Schema.slack.types.user_id,
-        description: "User who is affected by the incident",
+        type: Schema.types.string,
+        description:
+          "User who is affected by the ticket",
+        default: "Abraham Lincoln",
+        enum: ["Abraham Lincoln", "Adela Cervantsz", "Aileen Mottern", "Alejandra Prenatt"],
+        choices: [{
+          title: "Abraham Lincoln",
+          value: "Abraham Lincoln",
+        }, {
+          title: "Adela Cervantsz",
+          value: "Adela Cervantsz",
+        }, {
+          title: "Aileen Mottern",
+          value: "Aileen Mottern",
+        }, {
+          title: "Alejandra Prenatt",
+          value: "Alejandra Prenatt",
+        }],
       },
       channel: {
         type: Schema.slack.types.channel_id,
@@ -169,7 +201,7 @@ export const CloseIncident = DefineFunction({
       close_code: {
         type: Schema.types.string,
         description:
-          "State of the incident: New, In Progress, On Hold, Cancelled",
+          "State of the incident: New, In Progress, On Hold, Canceled",
         default: "Closed/Resolved By Caller",
         enum: ["Solved (Work Around)", "Solved (Permanently)", "Solved Remotely (Work Around)", 
           "Solved Remotely (Permanently)", "Not Solved (Not Reproducible)", "Not Solved (Too Costly)", "Closed/Resolved By Caller" ],
@@ -220,8 +252,8 @@ export const CloseIncident = DefineFunction({
 });
 
 export default Manifest({
-  name: "ServiceNow for Slack",
-  description: "Reverse a string",
+  name: "ServiceNow for Slack2",
+  description: "Create, Update, Find, and Close ServiceNow Incidents all from Slack.",
   icon: "assets/icon.png",
   functions: [UpdateIncident, GetIncident, CreateIncident, CloseIncident],
   outgoingDomains: ["dev88853.service-now.com"],

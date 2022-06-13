@@ -44,16 +44,30 @@ export default async ({ token, inputs, env }: any) => {
 
     console.log('incidentResp:')
     console.log(incidentResp)
+    console.log('after inc resp:')
 
     //get user info so we can mention Slack Users directly in UI
-    let assignedToUser;
+    let assignedToUser: any, callerUser: any;
     let user = new User();
     if (inputs.assigned_to){
       assignedToUser = await user.getUserInfo(token, inputs.assigned_to)
     } else {
       assignedToUser = 'N/A'
     }
-    let callerUser: any = await user.getUserInfo(token, inputs.caller)
+
+    console.log('inputs: ')
+    console.log(inputs)
+    let isCallerSlackUser = await user.isSlackUser(token, inputs.caller)
+    console.log('isCallerSlackUser: ')
+    console.log(isCallerSlackUser)
+
+    if (isCallerSlackUser) {
+      console.log('this should be a slack user')
+      callerUser = await user.getUserInfo(token, inputs.caller)
+      callerUser = await callerUser.name
+    } else {
+      callerUser = inputs.caller
+    }
 
     //Get current state of the incident, make sure it looks nice in UI
     let state = new State()
@@ -66,11 +80,11 @@ export default async ({ token, inputs, env }: any) => {
     //assign Block Kit blocks for a better UI experience, check if someone was assigned    
     if (!assignedToUser){
       incidentBlock = block.getBlocks(header, incidentResp.result.number, incidentResp.result.short_description,
-        curState, inputs.comments, callerUser.name, assignedToUser, incidentLink)
+        curState, inputs.comments, callerUser, assignedToUser, incidentLink)
     }   
     else {
       incidentBlock = block.getBlocks(header, incidentResp.result.number, incidentResp.result.short_description,
-        curState, inputs.comments, callerUser.name, assignedToUser.name, incidentLink)
+        curState, inputs.comments, callerUser, assignedToUser.name, incidentLink)
     }
 
     //get channel name, and blocks to channel

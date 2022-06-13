@@ -34,7 +34,7 @@ export default async ({ token, inputs, env }: any) => {
       },
     },
   )
-  .then((getIncidentResp) => getIncidentResp.json())
+    .then((getIncidentResp) => getIncidentResp.json())
   console.log('getIncidentResp inside update: ')
   console.log(getIncidentResp)
 
@@ -47,7 +47,7 @@ export default async ({ token, inputs, env }: any) => {
     "state": closeState,
     "close_notes": inputs.close_notes,
   })
-  let weKnow = JSON.stringify( {"close_code":"Closed/Resolved By Caller","state":"7","close_notes":"Closed by API"})
+  let weKnow = JSON.stringify({ "close_code": "Closed/Resolved By Caller", "state": "7", "close_notes": "Closed by API" })
 
   console.log('requestBody: ')
   console.log(requestBody)
@@ -68,20 +68,42 @@ export default async ({ token, inputs, env }: any) => {
     .then((updateIncResp) => updateIncResp.json())
   console.log(updateIncResp)
 
+
   // Parse UserID to feed into getUserInfo
-  const callerInfo = await getIncidentResp.result[0].caller_id.link.split("/");
-  const assignedTo = await getIncidentResp.result[0].assigned_to.link.split("/");
-  let assignedToID = assignedTo[7]
+  let assignedToID: any, callerUser: any;
+  const callerInfo = await updateIncResp.result.caller_id.link.split("/");
+  if (updateIncResp.result.assigned_to === "") {
+    console.log('no assigned to')
+  } else {
+    const assignedTo = await updateIncResp.result.assigned_to.link.split("/");
+    assignedToID = assignedTo[7]
+  }
+
   let callerID = callerInfo[7]
+
+  console.log('inputs: ')
+  console.log(inputs)
+  let isCallerSlackUser = await user.isSlackUser(token, callerID)
+  console.log('isCallerSlackUser: ')
+  console.log(isCallerSlackUser)
+
+  if (isCallerSlackUser) {
+    console.log('this should be a slack user')
+    callerUser = await user.getUserInfo(token, callerID)
+    callerUser = await callerUser.name
+  } else {
+    callerUser = await updateIncResp.result.caller_id.value
+  }
+  console.log('callerUser: ')
+  console.log(callerUser)
 
   // Grab userInfo to update the UI with Slack Users
   let assignedToUser, incidentBlock;
-  let callerUser: any = await user.getUserInfo(token, callerID)
 
   if (assignedToID) {
     console.log(assignedToUser)
     assignedToUser = await user.getUserInfo(token, assignedToID)
-
+    assignedToUser = assignedToUser.name
   } else {
     assignedToUser = 'N/A'
   }
@@ -91,14 +113,8 @@ export default async ({ token, inputs, env }: any) => {
   console.log(curState)
 
   //assign Block Kit blocks for a better UI experience, check if someone was assigned    
-  if (!assignedToID){
-    incidentBlock = block.getBlocks(header, getIncidentResp.result[0].number, getIncidentResp.result[0].short_description,
-      curState, getIncidentResp.result[0].comments, callerUser.name, assignedToUser, incidentLink)
-  }   
-  else {
-    incidentBlock = block.getBlocks(header, getIncidentResp.result[0].number, getIncidentResp.result[0].short_description,
-      curState, getIncidentResp.result[0].comments, callerUser.name, assignedToUser.name, incidentLink)
-  }
+  incidentBlock = block.getBlocks(header, getIncidentResp.result[0].number, getIncidentResp.result[0].short_description,
+    curState, getIncidentResp.result[0].comments, callerUser, assignedToUser, incidentLink)
 
   let channelInfo: any = await channelObj.getChannelInfo(token, channel)
   await channelObj.postToChannel(token, channel, incidentBlock);

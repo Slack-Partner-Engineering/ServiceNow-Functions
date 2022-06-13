@@ -82,7 +82,7 @@ export default async ({ token, inputs, env }: any) => {
   //Get current state of the incident, make sure it looks nice in UI
 
   // Parse UserID to feed into getUserInfo
-  let assignedToID;
+  let assignedToID:any, callerUser: any;
   const callerInfo = await updateIncResp.result.caller_id.link.split("/");
   if (updateIncResp.result.assigned_to === "") {
     console.log('no assigned to')
@@ -93,9 +93,24 @@ export default async ({ token, inputs, env }: any) => {
 
   let callerID = callerInfo[7]
 
+  console.log('inputs: ')
+  console.log(inputs)
+  let isCallerSlackUser = await user.isSlackUser(token, callerID)
+  console.log('isCallerSlackUser: ')
+  console.log(isCallerSlackUser)
+
+  if (isCallerSlackUser) {
+    console.log('this should be a slack user')
+    callerUser = await user.getUserInfo(token, inputs.caller)
+    callerUser = await callerUser.name
+  } else {
+    callerUser = await updateIncResp.result.caller_id.display_value
+  }
+  console.log('callerUser: ')
+  console.log(callerUser)
+
   // Grab userInfo to update the UI with Slack Users
   let assignedToUser, incidentBlock;
-  let callerUser: any = await user.getUserInfo(token, callerID)
 
   if (assignedToID) {
     console.log(assignedToUser)
@@ -105,16 +120,16 @@ export default async ({ token, inputs, env }: any) => {
     assignedToUser = 'N/A'
   }
 
-  let curState = state.getStateFromNum(updateIncResp.result.state)
+  let curState = state.getStateFromString(updateIncResp.result.state)
 
   //assign Block Kit blocks for a better UI experience, check if someone was assigned    
   if (!assignedToID) {
     incidentBlock = block.getBlocks(header, updateIncResp.result.number, updateIncResp.result.short_description,
-      curState, updateIncResp.result.comments, callerUser.name, assignedToUser, incidentLink)
+      curState, updateIncResp.result.comments, callerUser, assignedToUser, incidentLink)
   }
   else {
     incidentBlock = block.getBlocks(header, updateIncResp.result.number, updateIncResp.result.short_description,
-      curState, updateIncResp.result.comments, callerUser.name, assignedToUser.name, incidentLink)
+      curState, updateIncResp.result.comments, callerUser, assignedToUser.name, incidentLink)
   }
   let channelInfo: any = await channelObj.getChannelInfo(token, channel)
   await channelObj.postToChannel(token, channel, incidentBlock);
