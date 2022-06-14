@@ -1,8 +1,8 @@
-export class Blocks{
+export class Blocks {
 
   //builds the blocks to post to a channel. This is what the end user will see in Slack.
 
-  getBlocks(header:any, number:any, shortDescription:any, curState:any, comments:any, caller:any, assignedTo:any, incidentLink:any) {
+  getBlocks(header: any, number: any, shortDescription: any, curState: any, comments: any, caller: any, assignedTo: any, incidentLink: any) {
     console.log('getBlocks called in utils')
     let incidentBlock = [];
 
@@ -17,7 +17,7 @@ export class Blocks{
       assignedTo = 'N/A'
     }
 
-    incidentBlock.push(   {
+    incidentBlock.push({
       "type": "header",
       "text": {
         "type": "plain_text",
@@ -25,52 +25,52 @@ export class Blocks{
         "emoji": true
       }
     },
-    {
-      "type": "section",
-      "fields": [
-        {
+      {
+        "type": "section",
+        "fields": [
+          {
+            "type": "mrkdwn",
+            "text": "*Incident:* " + "\n" + `${number}` + " :warning:"
+          },
+          {
+            "type": "mrkdwn",
+            "text": "*Short Description: *\n" + `${shortDescription}`
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "fields": [
+          {
+            "type": "mrkdwn",
+            "text": "*State:*\n" + `${curState}`
+          },
+          {
+            "type": "mrkdwn",
+            "text": "*Comments:*\n" + `${comments}`
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "fields": [
+          {
+            "type": "mrkdwn",
+            "text": "*Caller:*\n" + `${caller}`
+          },
+          {
+            "type": "mrkdwn",
+            "text": "*Assigned To:*\n" + `@${assignedTo}`
+          }
+        ]
+      },
+      {
+        "type": "section",
+        "text": {
           "type": "mrkdwn",
-          "text": "*Incident:* " + "\n" +  `${number}` + " :warning:" 
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Short Description: *\n" + `${shortDescription}`
+          "text": "<" + `${incidentLink}` + "|" + "View Incident" + ">"
         }
-      ]
-    },
-    {
-      "type": "section",
-      "fields": [
-        {
-          "type": "mrkdwn",
-          "text": "*State:*\n" + `${curState}`
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Comments:*\n" + `${comments}`
-        }
-      ]
-    },
-    {
-      "type": "section",
-      "fields": [
-        {
-          "type": "mrkdwn",
-          "text": "*Caller:*\n" + `@${caller}`
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Assigned To:*\n" + `@${assignedTo}`
-        }
-      ]
-    },
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "<" + `${incidentLink}` + "|" + "View Incident" + ">"
-      }
-    });
+      });
     return incidentBlock;
   }
 }
