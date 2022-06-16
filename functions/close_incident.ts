@@ -2,21 +2,25 @@ import { Blocks } from "../utils/get_blocks.ts";
 import { State } from "../utils/get_state.ts";
 import { User } from "../utils/get_user_info.ts";
 import { Channel } from "../utils/channel_utils.ts";
+import { Auth } from "../utils/get_auth.ts";
 
 export default async ({ token, inputs, env }: any) => {
   //Setting necessary env variables
-  const username = env["SERVICENOW_USERNAME"];
-  const password = env["SERVICENOW_PW"];
   const instance = env["SERVICENOW_INSTANCE"];
   // Setting up helper functions
   let state = new State()
   let channelObj = new Channel()
   let user = new User();
   let block = new Blocks();
+  const auth = new Auth()
+  const basicAuth = await auth.getBasicAuth(env)
+
   //Grabbing inputs from UI, setting up Slack API
   const channel = inputs.channel;
   const incident_number = inputs.incident_number;
-
+  //Setup Auth, can use either basic auth (easy, but not recommended for production purposes)
+  //Setup Auth with Access Token. Must take a few steps to get ServiceNow access token. Steps provided in README.md
+  // const bearerToken = "Bearer " + accessToken
   //ServiceNow Integer 7 maps out to "Closed"
   const closeState = "7";
 
@@ -29,7 +33,7 @@ export default async ({ token, inputs, env }: any) => {
     {
       method: "GET",
       headers: {
-        "Authorization": "Basic " + btoa(username + ":" + password),
+        "Authorization": basicAuth,
         "Content-Type": "application/json",
       },
     },
@@ -59,7 +63,7 @@ export default async ({ token, inputs, env }: any) => {
     {
       method: "PUT",
       headers: {
-        "Authorization": "Basic " + btoa(username + ":" + password),
+        "Authorization": basicAuth,
         "Content-Type": "application/json",
       },
       body: requestBody
@@ -92,7 +96,8 @@ export default async ({ token, inputs, env }: any) => {
     callerUser = await user.getUserInfo(token, callerID)
     callerUser = await callerUser.name
   } else {
-    callerUser = await updateIncResp.result.caller_id.value
+    callerUser = await user.getSysUserFromServiceNow(updateIncResp.result.caller_id.value, instance, basicAuth)
+    // callerUser = await updateIncResp.result.caller_id.value
   }
   console.log('callerUser: ')
   console.log(callerUser)

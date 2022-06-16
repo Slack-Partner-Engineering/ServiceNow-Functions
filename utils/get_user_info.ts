@@ -40,4 +40,22 @@ export class User {
     
     return true;
   }
+
+  async getSysUserFromServiceNow(sysUserID:any, instance: any, auth: any) {
+   //API request to create a new incident in ServiceNow
+   const incidentResp: any = await fetch(
+    "https://" + instance + ".service-now.com/api/now/table/sys_user/" + sysUserID,
+    {
+      method: "GET",
+      headers: {
+        "Authorization": auth,
+        "Content-Type": "application/json",
+      },
+    },
+  )
+    .then((incidentResp) => incidentResp.json())
+  console.log('incedentResp: ')
+  console.log(incidentResp)
+  return incidentResp.result.name
+  }
 }

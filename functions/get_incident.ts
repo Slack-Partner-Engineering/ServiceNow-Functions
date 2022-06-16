@@ -3,19 +3,18 @@ import { Blocks } from "../utils/get_blocks.ts";
 import { State } from "../utils/get_state.ts";
 import { User } from "../utils/get_user_info.ts";
 import { Channel } from "../utils/channel_utils.ts";
+import { Auth } from "../utils/get_auth.ts";
 
 export default async ({ token, inputs, env }: any) => {
   try {
-    //needed for auth,
-    const username = env["SERVICENOW_USERNAME"];
-    const password = env["SERVICENOW_PW"];
     const instance = env["SERVICENOW_INSTANCE"];
     // Setting up helper functions
     let state = new State()
     let channelObj = new Channel()
     let user = new User();
     let block = new Blocks();
-
+    const auth = new Auth()
+    const basicAuth = await auth.getBasicAuth(env)
     // the channel to post incident info to
     const channel = inputs.channel
     const header = "Incident Info :information_source:";
@@ -25,36 +24,12 @@ export default async ({ token, inputs, env }: any) => {
       {
         method: "GET",
         headers: {
-          "Authorization": "Basic " + btoa(username + ":" + password),
+          "Authorization": basicAuth,
           "Content-Type": "application/json",
         },
       },
     )
       .then((incidentResp) => incidentResp.json())
-
-    // let assignedToID;
-    // if (incidentResp.result[0].assigned_to) {
-    //   const assignedTo = await incidentResp.result[0].assigned_to.link.split("/");
-    //   assignedToID = assignedTo[7]
-    // }
-
-    // const callerInfo = await incidentResp.result[0].caller_id.link.split("/");
-    // let callerID = callerInfo[7]
-    //get user info so we can mention Slack Users directly in UI
-    // let assignedToUser;
-    // let user = new User();
-
-    // if (assignedToID) {
-    //   assignedToUser = await user.getUserInfo(token, assignedToID)
-    //   console.log(assignedToUser)
-    // } else {
-    //   assignedToUser = 'N/A'
-    // }
-    // let callerUser: any = await user.getUserInfo(token, callerID)
-
-    // console.log('incidentResp: ')
-    // console.log(incidentResp)
-
 
     // Parse UserID to feed into getUserInfo
     let assignedToID: any, callerUser: any;

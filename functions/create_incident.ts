@@ -3,13 +3,13 @@ import { Blocks } from "../utils/get_blocks.ts";
 import { State } from "../utils/get_state.ts";
 import { User } from "../utils/get_user_info.ts";
 import { Channel } from "../utils/channel_utils.ts";
+import { Auth } from "../utils/get_auth.ts";
 
 export default async ({ token, inputs, env }: any) => {
   try {
-    //needed for auth,
-    const username = env["SERVICENOW_USERNAME"];
-    const password = env["SERVICENOW_PW"];
     const instance = env["SERVICENOW_INSTANCE"];
+    const auth = new Auth()
+    const basicAuth = await auth.getBasicAuth(env)
     // the channel to post incident info to
     const channel = inputs.channel
     const header = "New Incident Created :memo:";
@@ -34,7 +34,7 @@ export default async ({ token, inputs, env }: any) => {
       {
         method: "POST",
         headers: {
-          "Authorization": "Basic " + btoa(username + ":" + password),
+          "Authorization": basicAuth,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody)
