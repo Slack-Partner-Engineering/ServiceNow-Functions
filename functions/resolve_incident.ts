@@ -21,10 +21,10 @@ export default async ({ token, inputs, env }: any) => {
   //Setup Auth, can use either basic auth (easy, but not recommended for production purposes)
   //Setup Auth with Access Token. Must take a few steps to get ServiceNow access token. Steps provided in README.md
   // const bearerToken = "Bearer " + accessToken
-  //ServiceNow Integer 7 maps out to "Closed"
-  const closeState = "7";
+  //ServiceNow Integer 6 maps out to "Resolved"
+  const resolveState = "6";
 
-  const header = ":negative_squared_cross_mark: Incident Closed :negative_squared_cross_mark:";
+  const header = "✅ Incident Resolved ✅";
   let incidentLink = "https://" + instance + ".service-now.com/nav_to.do?uri=task.do?sysparm_query=number=" + incident_number
 
   //API call to look up incident to grab its SysID. We need this later on for the Update API call. 
@@ -48,7 +48,7 @@ export default async ({ token, inputs, env }: any) => {
 
   let requestBody = await JSON.stringify({
     "close_code": inputs.close_code,
-    "state": closeState,
+    "state": resolveState,
     "close_notes": inputs.close_notes,
   })
 
@@ -56,7 +56,7 @@ export default async ({ token, inputs, env }: any) => {
   console.log(requestBody)
 
   // const urlWithSysParm = "https://" + instance + ".service-now.com/api/now/table/incident/" + sys_id + '?sysparm_display_value=true'
-  const url = "https://" + instance + ".service-now.com/api/now/table/incident/" + sys_id
+  const url = "https://" + instance + ".service-now.com/api/now/table/incident/" + sys_id + "?sysparm_display_value=true"
   const updateIncResp = await fetch(
     url,
     {
@@ -95,8 +95,12 @@ export default async ({ token, inputs, env }: any) => {
     callerUser = await user.getUserInfo(token, callerID)
     callerUser = await callerUser.name
   } else {
-    callerUser = await user.getSysUserFromServiceNow(updateIncResp.result.caller_id.value, instance, basicAuth)
-    // callerUser = await updateIncResp.result.caller_id.value
+    if (updateIncResp.result.caller_id.display_value) {
+      console.log('geting the display_value for caller: ', updateIncResp.result.caller_id.display_value)
+      callerUser = updateIncResp.result.caller_id.display_value
+    } else {
+      callerUser = await user.getSysUserFromServiceNow(updateIncResp.result.caller_id.value, instance, basicAuth)
+    }
   }
   console.log('callerUser: ')
   console.log(callerUser)
@@ -112,13 +116,13 @@ export default async ({ token, inputs, env }: any) => {
     assignedToUser = 'N/A'
   }
 
-  let curState = state.getStateFromNum(closeState)
+  let curState = state.getStateFromNum(resolveState)
   console.log('cur state')
   console.log(curState)
 
   //assign Block Kit blocks for a better UI experience, check if someone was assigned    
   incidentBlock = block.getBlocks(header, getIncidentResp.result[0].number, getIncidentResp.result[0].short_description,
-    curState, getIncidentResp.result[0].comments, callerUser, assignedToUser, incidentLink)
+    curState, updateIncResp.result.comments, callerUser, assignedToUser, incidentLink)
 
   let channelInfo: any = await channelObj.getChannelInfo(token, channel)
   await channelObj.postToChannel(token, channel, incidentBlock);

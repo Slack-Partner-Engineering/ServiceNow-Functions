@@ -3,16 +3,7 @@ export class State {
   // This function returns the state - it converts from integer which is often returned 
   // from ServiceNow to the value which is more readable. For example - 6 means Resolved.
 
-  //Additional Cases which may be useful later: 
-  // case '6':
-  //   //needs resolution notes if you choose it which will cause an error.
-  //   curState = "Resolved ✅";
-  //   break;
-  // case '7':
-  //   // if you choose this state, you must provide resolution code, close notes
-  //   curState = "Closed 🆇";
-  //   break;
-  getStateFromNum(incidentState:any) {
+  getStateFromNum(incidentState: any) {
     console.log('getState called in utils')
     console.log('incidentState: ')
     console.log(incidentState)
@@ -29,8 +20,11 @@ export class State {
       case '3':
         curState = "On Hold ✋🏼";
         break;
+      case '6':
+        curState = "Resolved ✅";
+        break;
       case '7':
-        curState = "Closed :negative_squared_cross_mark:";
+        curState = "Closed ❎";
         break;
       case '8':
         curState = "Cancelled ❌";
@@ -42,7 +36,7 @@ export class State {
     return curState;
   }
 
-  getStateFromString(incidentState:any) {
+  getStateFromString(incidentState: any) {
     console.log('getState called in utils')
     console.log('incidentState: ')
     console.log(incidentState)
@@ -56,6 +50,14 @@ export class State {
         console.log('inside case 2')
         curState = "In Progress 👷🏻‍♂️";
         break;
+      case 'Resolved':
+        console.log('inside case 2')
+        curState = "Resolved ✅";
+        break;
+      case 'Closed':
+        console.log('inside case 2')
+        curState = "Closed ❎";
+        break;  
       case 'On Hold':
         curState = "On Hold ✋🏼";
         break;

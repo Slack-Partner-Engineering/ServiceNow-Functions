@@ -68,6 +68,10 @@ export const UpdateIncident = DefineFunction({
         type: Schema.types.string,
         description: "Comments for the incident",
       },
+      work_notes: {
+        type: Schema.types.string,
+        description: "Work notes for the incident",
+      },
       assigned_to: {
         type: Schema.slack.types.user_id,
         description: "User who is responisble for working on the incident",
@@ -251,11 +255,76 @@ export const CloseIncident = DefineFunction({
   },
 });
 
+export const ResolveIncident = DefineFunction({
+  callback_id: "resolveIncident",
+  title: "Resolve an Incident",
+  description: "Resolve an Incident from your ServiceNow instance, with resolution code and close notes.",
+  source_file: "functions/resolve_incident.ts",
+  input_parameters: {
+    properties: {
+      incident_number: {
+        type: Schema.types.string,
+        description: "The incident to update, for example: INC0000049",
+      },
+      close_code: {
+        type: Schema.types.string,
+        description:
+          "State of the incident: New, In Progress, On Hold, Canceled",
+        default: "Closed/Resolved By Caller",
+        enum: ["Solved (Work Around)", "Solved (Permanently)", "Solved Remotely (Work Around)", 
+          "Solved Remotely (Permanently)", "Not Solved (Not Reproducible)", "Not Solved (Too Costly)", "Closed/Resolved By Caller" ],
+        choices: [{
+          title: "Solved (Work Around)",
+          value: "Solved (Work Around)",
+        }, {
+          title: "Solved (Permanently)",
+          value: "Solved (Permanently)",
+        }, {
+          title: "Solved Remotely (Work Around)",
+          value: "Solved Remotely (Work Around)",
+        }, {
+          title: "Solved Remotely (Permanently)",
+          value: "Solved Remotely (Permanently)",
+        }, {
+          title: "Not Solved (Not Reproducible)",
+          value: "Not Solved (Not Reproducible)",
+        }, {
+          title: "Not Solved (Too Costly)",
+          value: "Not Solved (Too Costly)",
+        }, {
+          title: "Closed/Resolved By Caller",
+          value: "Closed/Resolved By Caller",
+        }
+      ],
+      },
+      close_notes: {
+        type: Schema.types.string,
+        description: "Resolution notes for the incident",
+      },
+      channel: {
+        type: Schema.slack.types.channel_id,
+        description: "Select channel to post results in",
+      },
+    },
+    required: ["channel", "incident_number", "close_notes", "close_code"],
+  },
+  output_parameters: {
+    properties: {
+      ServiceNowResponse: {
+        type: Schema.types.string,
+        description: "The API response from ServiceNow",
+      },
+    },
+    required: ["ServiceNowResponse"],
+  },
+});
+
+
 export default Manifest({
   name: "ServiceNow for Slack2",
   description: "Create, Update, Find, and Close ServiceNow Incidents all from Slack.",
   icon: "assets/icon.png",
-  functions: [UpdateIncident, GetIncident, CreateIncident, CloseIncident],
+  functions: [UpdateIncident, GetIncident, CreateIncident, ResolveIncident, CloseIncident],
   outgoingDomains: ["dev88853.service-now.com"],
   botScopes: ["commands", "chat:write", "chat:write.public", "channels:read", "users:read"],
 });
