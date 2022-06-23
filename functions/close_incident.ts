@@ -95,7 +95,13 @@ export default async ({ token, inputs, env }: any) => {
     callerUser = await user.getUserInfo(token, callerID)
     callerUser = await callerUser.name
   } else {
-    callerUser = await user.getSysUserFromServiceNow(updateIncResp.result.caller_id.value, instance, basicAuth)
+    
+    if (updateIncResp.result.caller_id.display_value) {
+      console.log('geting the display_value for caller: ', updateIncResp.result.caller_id.display_value)
+      callerUser = updateIncResp.result.caller_id.display_value
+    } else {
+      callerUser = await user.getSysUserFromServiceNow(updateIncResp.result.caller_id.value, instance, basicAuth)
+    }
     // callerUser = await updateIncResp.result.caller_id.value
   }
   console.log('callerUser: ')

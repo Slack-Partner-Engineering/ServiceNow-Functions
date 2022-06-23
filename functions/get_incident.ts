@@ -21,17 +21,33 @@ export default async ({ token, inputs, env, }: any) => {
 
     let url = "https://" + instance + ".service-now.com/api/now/table/incident?sysparm_query"
 
-    if (inputs.incident_number) {
-      url = url.concat("=number%3D" + inputs.incident_number)
-    } else {
-      if (inputs.caller) {
-        url = url.concat("?sysparm_query=user_name%3D" + inputs.caller)
-      }
-      url = url.concat("&sysparm_display_value=true")
-      url = url.concat("&sysparm_limit=" + inputs.limit)
-      console.log(url)
-    }
 
+    console.log('before inputs caller')
+    if (inputs.caller) {
+      url = url.concat("=caller_id.user_name%3D" + inputs.caller)
+    }
+    if (inputs.incident_number) {
+      url = url.concat("%5Enumber%3D" + inputs.incident_number)
+    }     
+    if (inputs.limit) {
+      url = url.concat("&sysparm_limit=" + inputs.limit)
+    }
+    if (inputs.assignedTo) {
+      url = url.concat("&sysparm_limit=" + inputs.limit)
+    }
+    // want to add this parameter to be able to see the work notes and comments in the UI
+    // url = url.concat("&sysparm_display_value=true")
+
+    console.log('url: ')
+    console.log(url)
+    console.log('inputs: ')
+    console.log(inputs)
+
+    //what it's supposed to be
+    //https://dev88853.service-now.com/api/now/table/incident?sysparm_query=user_name%3Dabraham.lincoln&sysparm_limit=10");
+    //https://dev88853.service-now.com/api/now/table/incident?sysparm_query=user_name%3Dabraham.lincoln&sysparm_limit=3
+
+    //mine U0368LRBZ44
     const incidentResp: any = await fetch(
       // "https://" + instance + ".service-now.com/api/now/table/incident" + "?sysparm_query=number%3D" + inputs.incident_number + "&sysparm_limit=1&sysparm_display_value=true",
       url,
@@ -51,7 +67,7 @@ export default async ({ token, inputs, env, }: any) => {
     blocks = [];
     console.log('typeof blocks')
     console.log(typeof blocks)
-    for (let i = 0; i < inputs.limit; i++) {
+    for (let i = 0; i < incidentResp.result.length; i++) {
       let assignedToID: any, callerUser: any;
       const callerInfo = await incidentResp.result[i].caller_id.link.split("/");
       if (incidentResp.result[i].assigned_to === "") {
@@ -74,7 +90,12 @@ export default async ({ token, inputs, env, }: any) => {
         callerUser = await user.getUserInfo(token, callerID)
         callerUser = await callerUser.name
       } else {
-        callerUser = await incidentResp.result[i].caller_id.display_value
+        if (incidentResp.result[i].caller_id.display_value) {
+          console.log('geting the display_value for caller: ', incidentResp.result[i].caller_id.display_value)
+          callerUser = incidentResp.result[i].caller_id.display_value
+        } else {
+          callerUser = await user.getSysUserFromServiceNow(incidentResp.result[i].caller_id.value, instance, basicAuth)
+        }
       }
       console.log('callerUser: ')
       console.log(callerUser)
@@ -91,7 +112,7 @@ export default async ({ token, inputs, env, }: any) => {
       }
 
       //Get current state of the incident, make sure it looks nice in UI
-      let curState = state.getStateFromString(incidentResp.result[i].state)
+      let curState = state.getStateFromNum(incidentResp.result[i].state)
 
       //set the blocks to show in the UI
       const incident_number = incidentResp.result[i].task_effective_number
@@ -110,7 +131,6 @@ export default async ({ token, inputs, env, }: any) => {
       }
     
     }
-
 
     let channelInfo: any = await channelObj.getChannelInfo(token, channel)
     await channelObj.postToChannel(token, channel, blocks);

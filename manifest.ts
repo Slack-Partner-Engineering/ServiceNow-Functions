@@ -7,10 +7,6 @@ export const GetIncident = DefineFunction({
   source_file: "functions/get_incident.ts",
   input_parameters: {
     properties: {
-      incident_number: {
-        type: Schema.types.string,
-        description: "The incident to find, for example: INC0000049",
-      },
       caller: {
         type: Schema.types.string,
         description:
@@ -31,10 +27,10 @@ export const GetIncident = DefineFunction({
           value: "alejandra.prenatt",
         }],
       },
-      assigned_to: {
-        type: Schema.slack.types.user_id,
-        description: "User who is responisble for working on the incident",
-      },
+      // assigned_to: {
+      //   type: Schema.slack.types.user_id,
+      //   description: "User who is responisble for working on the incident",
+      // },
       limit: {
         type: Schema.types.string,
         description:
@@ -59,8 +55,41 @@ export const GetIncident = DefineFunction({
         type: Schema.slack.types.channel_id,
         description: "Select channel to post results in",
       },
+      // incident_number: {
+      //   type: Schema.types.string,
+      //   description: "The incident to update, for example: INC0000049",
+      // },
     },
     required: ["channel"],
+  },
+  output_parameters: {
+    properties: {
+      ServiceNowResponse: {
+        type: Schema.types.string,
+        description: "",
+      },
+    },
+    required: ["ServiceNowResponse"],
+  },
+});
+
+export const GetIncidentByID = DefineFunction({
+  callback_id: "getIncidentByID",
+  title: "Find an Incident by ID",
+  description: "Get an Incident from your ServiceNow instance and post details to a channel.",
+  source_file: "functions/get_incident_by_id.ts",
+  input_parameters: {
+    properties: {
+      incident_number: {
+        type: Schema.types.string,
+        description: "The incident to find, for example: INC0000049",
+      },
+      channel: {
+        type: Schema.slack.types.channel_id,
+        description: "Select channel to post results in",
+      },
+    },
+    required: ["incident_number", "channel"],
   },
   output_parameters: {
     properties: {
@@ -368,7 +397,7 @@ export default Manifest({
   name: "ServiceNow for Slack2",
   description: "Create, Update, Find, and Close ServiceNow Incidents all from Slack.",
   icon: "assets/icon.png",
-  functions: [UpdateIncident, GetIncident, CreateIncident, ResolveIncident, CloseIncident],
+  functions: [UpdateIncident, GetIncident, CreateIncident, ResolveIncident, CloseIncident, GetIncidentByID],
   outgoingDomains: ["dev88853.service-now.com"],
   botScopes: ["commands", "chat:write", "chat:write.public", "channels:read", "users:read"],
 });
