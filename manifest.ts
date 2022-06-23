@@ -11,12 +11,56 @@ export const GetIncident = DefineFunction({
         type: Schema.types.string,
         description: "The incident to find, for example: INC0000049",
       },
+      caller: {
+        type: Schema.types.string,
+        description:
+          "User who is affected by the ticket",
+        default: "Abraham Lincoln",
+        enum: ["abraham.lincoln", "adela.cervantsz", "aileen.mottern", "alejandra.prenatt"],
+        choices: [{
+          title: "Abraham Lincoln",
+          value: "abraham.lincoln",
+        }, {
+          title: "Adela Cervantsz",
+          value: "adela.cervantsz",
+        }, {
+          title: "Aileen Mottern",
+          value: "aileen.mottern",
+        }, {
+          title: "Alejandra Prenatt",
+          value: "alejandra.prenatt",
+        }],
+      },
+      assigned_to: {
+        type: Schema.slack.types.user_id,
+        description: "User who is responisble for working on the incident",
+      },
+      limit: {
+        type: Schema.types.string,
+        description:
+          "Maxiumum number of incidents to return",
+        default: "3",
+        enum: ["1", "3", "5", "10"],
+        choices: [{
+          title: "1",
+          value: "1",
+        }, {
+          title: "3",
+          value: "3",
+        }, {
+          title: "5",
+          value: "5",
+        }, {
+          title: "10",
+          value: "10",
+        }],
+      },
       channel: {
         type: Schema.slack.types.channel_id,
         description: "Select channel to post results in",
       },
     },
-    required: ["incident_number", "channel"],
+    required: ["channel"],
   },
   output_parameters: {
     properties: {

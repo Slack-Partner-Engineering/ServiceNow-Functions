@@ -2,9 +2,8 @@ export class Blocks {
 
   //builds the blocks to post to a channel. This is what the end user will see in Slack.
 
-  getBlocks(header: any, number: any, shortDescription: any, curState: any, comments: any, caller: any, assignedTo: any, incidentLink: any) {
+  getBlocks(header: any, number: any, shortDescription: any, curState: any, comments: any, caller: any, assignedTo: any, incidentLink: any, blocks: any) {
     console.log('getBlocks called in utils')
-    let incidentBlock = [];
 
     console.log(caller)
 
@@ -17,7 +16,7 @@ export class Blocks {
       assignedTo = 'N/A'
     }
 
-    incidentBlock.push({
+    blocks.push({
       "type": "header",
       "text": {
         "type": "plain_text",
@@ -71,6 +70,8 @@ export class Blocks {
           "text": "<" + `${incidentLink}` + "|" + "View Incident" + ">"
         }
       });
-    return incidentBlock;
+      console.log('logging blockls type')
+    console.log(typeof blocks)
+    return blocks;
   }
 }

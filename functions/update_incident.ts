@@ -111,7 +111,10 @@ export default async ({ token, inputs, env }: any) => {
   console.log(callerUser)
 
   // Grab userInfo to update the UI with Slack Users
-  let assignedToUser, incidentBlock;
+  let assignedToUser;
+
+  let incidentBlock: any[];
+  incidentBlock = [];
 
   if (assignedToID) {
     console.log(assignedToUser)
@@ -126,11 +129,11 @@ export default async ({ token, inputs, env }: any) => {
   //assign Block Kit blocks for a better UI experience, check if someone was assigned    
   if (!assignedToID) {
     incidentBlock = block.getBlocks(header, updateIncResp.result.number, updateIncResp.result.short_description,
-      curState, updateIncResp.result.comments, callerUser, assignedToUser, incidentLink)
+      curState, updateIncResp.result.comments, callerUser, assignedToUser, incidentLink, incidentBlock)
   }
   else {
     incidentBlock = block.getBlocks(header, updateIncResp.result.number, updateIncResp.result.short_description,
-      curState, updateIncResp.result.comments, callerUser, assignedToUser.name, incidentLink)
+      curState, updateIncResp.result.comments, callerUser, assignedToUser.name, incidentLink, incidentBlock)
   }
   let channelInfo: any = await channelObj.getChannelInfo(token, channel)
   await channelObj.postToChannel(token, channel, incidentBlock);
