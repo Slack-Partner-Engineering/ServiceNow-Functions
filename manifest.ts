@@ -1,10 +1,10 @@
 import { DefineFunction, Manifest, Schema } from "deno-slack-sdk/mod.ts";
 
-export const GetIncident = DefineFunction({
-  callback_id: "getIncident",
-  title: "Find an Incident",
+export const GetIncidentByCaller = DefineFunction({
+  callback_id: "getIncidentByCaller",
+  title: "Find an Incident by Caller",
   description: "Get an Incident from your ServiceNow instance and post details to a channel.",
-  source_file: "functions/get_incident.ts",
+  source_file: "functions/get_incident_by_caller.ts",
   input_parameters: {
     properties: {
       caller: {
@@ -27,10 +27,6 @@ export const GetIncident = DefineFunction({
           value: "alejandra.prenatt",
         }],
       },
-      // assigned_to: {
-      //   type: Schema.slack.types.user_id,
-      //   description: "User who is responisble for working on the incident",
-      // },
       limit: {
         type: Schema.types.string,
         description:
@@ -55,12 +51,8 @@ export const GetIncident = DefineFunction({
         type: Schema.slack.types.channel_id,
         description: "Select channel to post results in",
       },
-      // incident_number: {
-      //   type: Schema.types.string,
-      //   description: "The incident to update, for example: INC0000049",
-      // },
     },
-    required: ["channel"],
+    required: ["channel", "caller"],
   },
   output_parameters: {
     properties: {
@@ -72,6 +64,56 @@ export const GetIncident = DefineFunction({
     required: ["ServiceNowResponse"],
   },
 });
+
+export const GetIncidentByAssginee = DefineFunction({
+  callback_id: "GetIncidentByAssginee",
+  title: "Find an Incident by Assignee",
+  description: "Get an Incident from your ServiceNow instance by assignee and post details to a channel.",
+  source_file: "functions/get_incident_by_assignee.ts",
+  input_parameters: {
+    properties: {
+      assigned_to: {
+        type: Schema.slack.types.user_id,
+        description: "User who is responisble for working on the incident",
+      },
+      limit: {
+        type: Schema.types.string,
+        description:
+          "Maxiumum number of incidents to return",
+        default: "3",
+        enum: ["1", "3", "5", "10"],
+        choices: [{
+          title: "1",
+          value: "1",
+        }, {
+          title: "3",
+          value: "3",
+        }, {
+          title: "5",
+          value: "5",
+        }, {
+          title: "10",
+          value: "10",
+        }],
+      },
+      channel: {
+        type: Schema.slack.types.channel_id,
+        description: "Select channel to post results in",
+      },
+    },
+    required: ["channel", "assigned_to"],
+  },
+  output_parameters: {
+    properties: {
+      ServiceNowResponse: {
+        type: Schema.types.string,
+        description: "",
+      },
+    },
+    required: ["ServiceNowResponse"],
+  },
+});
+
 
 export const GetIncidentByID = DefineFunction({
   callback_id: "getIncidentByID",
@@ -397,7 +439,7 @@ export default Manifest({
   name: "ServiceNow for Slack2",
   description: "Create, Update, Find, and Close ServiceNow Incidents all from Slack.",
   icon: "assets/icon.png",
-  functions: [UpdateIncident, GetIncident, CreateIncident, ResolveIncident, CloseIncident, GetIncidentByID],
+  functions: [UpdateIncident, GetIncidentByCaller, GetIncidentByAssginee, CreateIncident, ResolveIncident, CloseIncident, GetIncidentByID],
   outgoingDomains: ["dev88853.service-now.com"],
   botScopes: ["commands", "chat:write", "chat:write.public", "channels:read", "users:read"],
 });

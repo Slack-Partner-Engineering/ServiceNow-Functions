@@ -30,6 +30,8 @@ export default async ({ token, inputs, env }: any) => {
       },
     )
       .then((incidentResp) => incidentResp.json())
+      console.log('incidentResp from call by ID: ')
+      console.log(incidentResp)
 
     // Parse UserID to feed into getUserInfo
     let assignedToID: any, callerUser: any;
@@ -45,6 +47,8 @@ export default async ({ token, inputs, env }: any) => {
 
     console.log('inputs: ')
     console.log(inputs)
+    console.log('callerID: ')
+    console.log(callerID)
     let isCallerSlackUser = await user.isSlackUser(token, callerID)
     console.log('isCallerSlackUser: ')
     console.log(isCallerSlackUser)

@@ -8,6 +8,7 @@ export class User {
     console.log('getUserInfo called in utils: ')
     console.log('userID: ')
     console.log(userID)
+    console.log(token)
 
     const client = SlackAPI(token, {});
 

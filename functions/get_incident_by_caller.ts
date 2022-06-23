@@ -36,7 +36,7 @@ export default async ({ token, inputs, env, }: any) => {
       url = url.concat("&sysparm_limit=" + inputs.limit)
     }
     // want to add this parameter to be able to see the work notes and comments in the UI
-    // url = url.concat("&sysparm_display_value=true")
+    url = url.concat("&sysparm_display_value=true")
 
     console.log('url: ')
     console.log(url)
@@ -104,7 +104,7 @@ export default async ({ token, inputs, env, }: any) => {
       let assignedToUser;
 
       if (assignedToID) {
-        console.log(assignedToUser)
+        console.log(assignedToID)
         assignedToUser = await user.getUserInfo(token, assignedToID)
 
       } else {
@@ -112,7 +112,7 @@ export default async ({ token, inputs, env, }: any) => {
       }
 
       //Get current state of the incident, make sure it looks nice in UI
-      let curState = state.getStateFromNum(incidentResp.result[i].state)
+      let curState = state.getStateFromString(incidentResp.result[i].state)
 
       //set the blocks to show in the UI
       const incident_number = incidentResp.result[i].task_effective_number
@@ -148,3 +148,6 @@ export default async ({ token, inputs, env, }: any) => {
   }
 
 };
+//U03GLTFNLQH is kevin in homesite
+//U0368LRBZ44 is horea in homesite
+//U039XGZL5DW is horea in devrelsandbox
