@@ -60,6 +60,9 @@ export default async ({ token, inputs, env }: any) => {
   if (inputs.assigned_to) {
     requestBody.assigned_to = inputs.assigned_to
   }
+  if (inputs.work_notes) {
+    requestBody.work_notes = inputs.work_notes
+  }
 
   let body = await JSON.stringify(requestBody)
   console.log('body: ')
