@@ -70,8 +70,7 @@ export class Blocks {
           "text": "<" + `${incidentLink}` + "|" + "View Incident" + ">"
         }
       });
-      console.log('logging blockls type')
-    console.log(typeof blocks)
+
     return blocks;
   }
 }
