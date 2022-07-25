@@ -2,6 +2,9 @@
 
 This project aims to speed up the time to understand & implement functions with the [beta Slack platform](https://api.slack.com/future/quickstart). It uses the beta platform to perform CRUD operations (Create, Read, Update, Delete) within Slack. 
 
+## Disclaimer
+This project is built using pre-released features on the Slack Platform. It may contain bugs, performance issues, and isn't representative of the final product. The code in this project isn't meant to be a standard template. It may change or become legacy as updates are released to the Slack Beta Platform.
+
 # Steps 
 1. [Clone the repo](#step-1-clone-the-repo)
 2. [ServiceNow Configuration](#step-2-ServiceNow-configuration-basic-auth)
@@ -59,8 +62,7 @@ $ hermes-dev deploy
 
 ## Step 5. Run the Functions
 
-[![DeleteInc](https://media.slack-github.com/user/2212/files/9eacf4d7-770c-422e-afbe-6976b51ba233)](https://media.slack-github.com/user/2212/files/42c08e44-5f86-45ab-9483-ae4605b8f6c1)
-
+Videos will be out soon!
 
 Great job! Now you should be able to find your shortcut in the shortcuts menu! Go ahead and try it out by clicking on the shortcut and filling in the form.
 
