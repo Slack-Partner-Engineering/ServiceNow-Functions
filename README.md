@@ -62,19 +62,9 @@ $ hermes-dev deploy
 
 ## Step 5. Run the Functions
 
-Videos below show how to run the functions.
+The video below shows how to run the functions.
 
-Find an issue:
-
-https://user-images.githubusercontent.com/10428517/180848544-4ce4cba1-06ce-4a50-b62a-480423b387cb.mp4
-
-Create and Update an issue:
-
-https://user-images.githubusercontent.com/10428517/180848634-04c35065-c630-437c-91b5-655d664deaf3.mp4
-
-Update status and Filter by Assignee:
-
-https://user-images.githubusercontent.com/10428517/180849079-eceb0620-8c62-4b3c-abf2-7e09ba5814b7.mp4
+https://user-images.githubusercontent.com/10428517/180849456-186982c1-2d6d-4a8b-9405-730b48f7ec5c.mov
 
 Great job! Now you should be able to find your shortcut in the shortcuts menu! Go ahead and try it out by clicking on the shortcut and filling in the form.
 
